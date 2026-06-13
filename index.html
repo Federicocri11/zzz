@@ -17,6 +17,15 @@
 <meta property="og:url" content="https://zzz-app.com/">
 <meta name="twitter:card" content="summary_large_image">
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1H01H74GTS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-1H01H74GTS');
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -387,7 +396,13 @@ footer a:hover{color:var(--text)}
       timerInterval = setInterval(function(){
         document.getElementById("web-timer").innerHTML = "Active for <b>" + fmt(Date.now()-timerStart) + "</b>";
       }, 1000);
+      gtag('event', 'toggle_on');
     } else {
+      if (timerStart) {
+        gtag('event', 'toggle_off', {
+          duration_seconds: Math.round((Date.now() - timerStart) / 1000)
+        });
+      }
       card.classList.remove("active");
       dot.classList.remove("on");
       btn.classList.remove("on");
