@@ -9,6 +9,7 @@ permissions:
   contents: write
 
 jobs:
+
   build-windows:
     runs-on: windows-latest
     steps:
@@ -38,18 +39,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+      - name: Build Swift app
+        run: |
+          cd mac
+          swift build -c release
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt pyinstaller
+      - name: Create .app bundle
+        run: |
+          mkdir -p Zzz.app/Contents/MacOS
+          cp mac/.build/release/Zzz Zzz.app/Contents/MacOS/Zzz
+          cp mac/Info.plist Zzz.app/Contents/Info.plist
+          chmod +x Zzz.app/Contents/MacOS/Zzz
 
-      - name: Build
-        run: pyinstaller --windowed --name Zzz zzz.py
+      - name: Sign app (ad-hoc)
+        run: codesign --force --deep --sign - Zzz.app
 
       - name: Zip app bundle
-        run: cd dist && zip -r ../Zzz-mac.zip Zzz.app
+        run: zip -r Zzz-mac.zip Zzz.app
 
       - name: Upload to release
         uses: softprops/action-gh-release@v2
