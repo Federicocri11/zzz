@@ -105,6 +105,42 @@ nav .wordmark{font-size:24px}
 .hero .sub{font-size:clamp(17px,2.4vw,21px);color:var(--muted);max-width:620px;margin:0 auto 38px}
 .hero .sub b{color:var(--text);font-weight:600}
 
+/* ---------- web toggle ---------- */
+.web-card{
+  max-width:440px;margin:0 auto 28px;background:var(--bg-2);
+  border:1px solid var(--line);border-radius:20px;padding:36px 32px;
+  text-align:center;transition:border-color .3s,box-shadow .3s
+}
+.web-card.active{border-color:var(--accent);box-shadow:0 0 48px rgba(255,194,75,.18)}
+.web-status{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-bottom:22px;font-weight:600;font-size:16px;color:var(--muted);
+  transition:color .3s
+}
+.web-card.active .web-status{color:var(--text)}
+.status-dot{
+  width:10px;height:10px;border-radius:50%;background:var(--dim);flex:none;
+  transition:background .3s,box-shadow .3s
+}
+.status-dot.on{background:var(--accent);box-shadow:0 0 10px var(--accent)}
+.toggle-btn{
+  width:100%;padding:18px;border-radius:14px;border:none;
+  background:var(--bg-3);color:var(--text);
+  font-family:"Bricolage Grotesque",system-ui,sans-serif;
+  font-size:22px;font-weight:800;cursor:pointer;letter-spacing:-.01em;
+  transition:background .2s,transform .12s,box-shadow .2s,color .2s
+}
+.toggle-btn:hover{transform:translateY(-2px)}
+.toggle-btn.on{background:var(--accent);color:#1a1300;box-shadow:var(--glow)}
+.web-timer{margin-top:14px;font-size:14px;color:var(--muted);font-weight:500;min-height:20px}
+.web-timer b{color:var(--accent);font-weight:700}
+.web-note{margin-top:12px;font-size:12px;color:var(--dim)}
+.or-divider{
+  display:flex;align-items:center;gap:12px;max-width:440px;
+  margin:0 auto 20px;color:var(--dim);font-size:13px;font-weight:500
+}
+.or-divider::before,.or-divider::after{content:"";flex:1;height:1px;background:var(--line)}
+
 /* ---------- download buttons ---------- */
 .dl{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
 .btn{
@@ -230,9 +266,21 @@ footer a:hover{color:var(--text)}
   </div>
 
   <div class="wrap inner">
-    <span class="eyebrow"><span class="dot"></span> Free · No account · Windows &amp; macOS</span>
+    <span class="eyebrow"><span class="dot"></span> Free · No account · Works in any browser</span>
     <h1>Your computer keeps falling asleep.<br><em>Zzz</em> keeps it awake.</h1>
-    <p class="sub">A tiny app that lives in your tray and <b>keeps your computer awake</b> — no sleep, no screensaver, <b>no screen lock</b>. Perfect for presentations, long downloads, dashboards and long reads.</p>
+    <p class="sub">Use it right here in your browser — <b>no download needed</b>. Or grab the desktop app for your menu bar. No sleep, no screensaver, no screen lock.</p>
+
+    <div class="web-card" id="web-card">
+      <div class="web-status">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="status-text">Your screen is sleeping</span>
+      </div>
+      <button class="toggle-btn" id="toggle-btn" onclick="toggleWakeLock()">Keep Awake</button>
+      <div class="web-timer" id="web-timer"></div>
+      <p class="web-note" id="web-note">Keep this tab open · Works in Chrome, Edge, Safari · Free</p>
+    </div>
+
+    <div class="or-divider">or download the desktop app</div>
 
     <div id="download" class="dl">
       <a class="btn primary" id="dl-win" href="https://github.com/Federicocri11/zzz/releases/latest/download/Zzz-Setup.exe">
@@ -297,6 +345,10 @@ footer a:hover{color:var(--text)}
     </div>
     <div class="faq">
       <details open>
+        <summary>Do I need to download anything?</summary>
+        <div class="body">No. Click <b>"Keep Awake"</b> on this page and your screen stays on — no installation, no account, nothing to download. The browser version uses the <b>Screen Wake Lock API</b>, a standard web feature built into Chrome, Edge, and Safari. The desktop app is an optional alternative if you prefer a tray icon.</div>
+      </details>
+      <details>
         <summary>Is it safe? What is it actually doing?</summary>
         <div class="body">Zzz sends an <b>F15 keypress</b> — a key that does nothing visible (it doesn't type, click, or move anything) — every few minutes. That resets your system's idle timer so the screen won't sleep or lock. No account, no tracking, no data leaves your machine.</div>
       </details>
@@ -345,7 +397,7 @@ footer a:hover{color:var(--text)}
 </footer>
 
 <script>
-  // Highlight the build that matches the visitor's OS
+  // OS-detect for download buttons
   (function(){
     var ua = (navigator.userAgent || "").toLowerCase();
     var isMac = ua.indexOf("mac") > -1 && ua.indexOf("iphone") === -1 && ua.indexOf("ipad") === -1;
@@ -359,6 +411,78 @@ footer a:hover{color:var(--text)}
     }
   })();
   document.getElementById("yr").textContent = new Date().getFullYear();
+
+  // Wake Lock
+  var wakeLock = null;
+  var timerStart = null;
+  var timerInterval = null;
+
+  function fmt(ms) {
+    var s = Math.floor(ms / 1000);
+    var m = Math.floor(s / 60);
+    var h = Math.floor(m / 60);
+    if (h > 0) return pad(h)+":"+pad(m%60)+":"+pad(s%60);
+    return pad(m)+":"+pad(s%60);
+  }
+  function pad(n){ return String(n).padStart(2,"0"); }
+
+  function setUI(active) {
+    var card = document.getElementById("web-card");
+    var dot  = document.getElementById("status-dot");
+    var btn  = document.getElementById("toggle-btn");
+    var txt  = document.getElementById("status-text");
+    if (active) {
+      card.classList.add("active");
+      dot.classList.add("on");
+      btn.classList.add("on");
+      btn.textContent = "Stop";
+      txt.textContent = "Keeping your screen awake ✓";
+      timerStart = Date.now();
+      timerInterval = setInterval(function(){
+        document.getElementById("web-timer").innerHTML = "Active for <b>" + fmt(Date.now()-timerStart) + "</b>";
+      }, 1000);
+    } else {
+      card.classList.remove("active");
+      dot.classList.remove("on");
+      btn.classList.remove("on");
+      btn.textContent = "Keep Awake";
+      txt.textContent = "Your screen is sleeping";
+      clearInterval(timerInterval);
+      document.getElementById("web-timer").innerHTML = "";
+    }
+  }
+
+  async function toggleWakeLock() {
+    if (!("wakeLock" in navigator)) {
+      document.getElementById("web-note").textContent = "Wake Lock not supported in this browser — try Chrome or Edge.";
+      return;
+    }
+    if (wakeLock) {
+      await wakeLock.release();
+      wakeLock = null;
+      setUI(false);
+    } else {
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+        wakeLock.addEventListener("release", function() {
+          if (document.visibilityState !== "hidden") {
+            wakeLock = null;
+            setUI(false);
+          }
+        });
+        setUI(true);
+      } catch(e) {
+        document.getElementById("web-note").textContent = "Could not activate — try again or use the desktop app.";
+      }
+    }
+  }
+
+  // Re-acquire lock when tab becomes visible again
+  document.addEventListener("visibilitychange", async function() {
+    if (wakeLock !== null && document.visibilityState === "visible") {
+      try { wakeLock = await navigator.wakeLock.request("screen"); } catch(e) {}
+    }
+  });
 </script>
 
 </body>
