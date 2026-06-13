@@ -303,6 +303,7 @@ footer a:hover{color:var(--text)}
         <span class="os">Download for macOS<small>Apple Silicon &amp; Intel</small></span>
       </a>
     </div>
+    <div id="dl-hint" style="display:none;max-width:420px;margin:-4px auto 16px;font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:10px 15px;text-align:left;line-height:1.8"></div>
     <div style="display:flex;justify-content:center;margin-bottom:18px">
       <a class="btn" href="https://www.paypal.com/donate/?hosted_button_id=8YKXMA9WWDFCG" target="_blank" rel="noopener">
         <span style="font-size:16px">🛏️</span>
@@ -356,7 +357,7 @@ footer a:hover{color:var(--text)}
         <h2>Running in about a minute.</h2>
       </div>
       <div class="steps">
-        <div class="step"><div class="n">1</div><h3>Download &amp; open</h3><p>Grab the build for your system and launch it. On macOS, allow the Accessibility permission when prompted.</p></div>
+        <div class="step"><div class="n">1</div><h3>Download &amp; open</h3><p>Grab the build for your system. On macOS: right-click <b>Zzz.app → Open → Open</b>. On Windows: click <b>More info → Run anyway</b> if SmartScreen appears.</p></div>
         <div class="step"><div class="n">2</div><h3>Find the tray icon</h3><p>Zzz tucks itself into your menu bar (Mac) or system tray (Windows). No window, no clutter.</p></div>
         <div class="step"><div class="n">3</div><h3>Toggle &amp; forget</h3><p>Click to switch on. Your screen stays awake until you turn it off or quit. That's it.</p></div>
       </div>
@@ -383,8 +384,12 @@ footer a:hover{color:var(--text)}
           <div class="body">Often not. <b>Managed devices</b> (with MDM, Intune, or group policy) can enforce screen lock in ways a keypress can't reset, and IT can see and block apps like this. Zzz is built for your <b>own</b> computer — presentations, downloads, reading, monitoring. Please don't use it to get around your employer's security policy.</div>
         </details>
         <details>
-          <summary>Why does my browser warn me when I open it?</summary>
-          <div class="body">The first builds aren't code-signed yet, so Windows SmartScreen or macOS Gatekeeper may show a warning. On Windows: <b>More info → Run anyway</b>. On macOS: <b>right-click → Open</b>.</div>
+          <summary>Why does macOS or Windows show a security warning?</summary>
+          <div class="body">
+            The app isn't code-signed with a paid certificate yet, so the OS warns you on first launch. It's safe — here's how to get past it:<br><br>
+            <b>macOS (Gatekeeper):</b> Don't double-click. Instead, <b>right-click Zzz.app → Open → Open</b>. You only need to do this once — after that it opens normally.<br><br>
+            <b>Windows (SmartScreen):</b> Click <b>More info → Run anyway</b>. SmartScreen flags any unsigned executable from the web, regardless of content.
+          </div>
         </details>
         <details>
           <summary>How much does it cost?</summary>
@@ -430,6 +435,14 @@ footer a:hover{color:var(--text)}
       win.classList.remove("primary");
     } else {
       win.classList.add("recommended");
+    }
+    var hint = document.getElementById("dl-hint");
+    if (isMac) {
+      hint.innerHTML = '⚠️ <b style="color:var(--text)">First launch:</b> macOS will block the app. Right-click <b>Zzz.app → Open → Open</b> to run it. Only needed once.';
+      hint.style.display = 'block';
+    } else {
+      hint.innerHTML = '⚠️ <b style="color:var(--text)">First launch:</b> If Windows SmartScreen appears, click <b>More info → Run anyway</b>.';
+      hint.style.display = 'block';
     }
   })();
   document.getElementById("yr").textContent = new Date().getFullYear();

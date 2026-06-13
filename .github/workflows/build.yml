@@ -39,15 +39,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Swift app
+      - name: Build Swift app (universal)
         run: |
           cd mac
-          swift build -c release
+          swift build -c release --arch arm64
+          swift build -c release --arch x86_64
+          lipo -create -output Zzz \
+            .build/arm64-apple-macosx/release/Zzz \
+            .build/x86_64-apple-macosx/release/Zzz
 
       - name: Create .app bundle
         run: |
           mkdir -p Zzz.app/Contents/MacOS
-          cp mac/.build/release/Zzz Zzz.app/Contents/MacOS/Zzz
+          cp mac/Zzz Zzz.app/Contents/MacOS/Zzz
           cp mac/Info.plist Zzz.app/Contents/Info.plist
           chmod +x Zzz.app/Contents/MacOS/Zzz
 
