@@ -51,7 +51,7 @@ h1,h2,h3,.wordmark{font-family:"Bricolage Grotesque",system-ui,sans-serif;line-h
 a{color:inherit;text-decoration:none}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
 
-/* ---------- wordmark: struck-through "Zzz" = no sleep ---------- */
+/* ---------- wordmark ---------- */
 .wordmark{
   position:relative;font-weight:800;display:inline-block;color:var(--text);
 }
@@ -71,17 +71,16 @@ nav{
 nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
 nav .wordmark{font-size:24px}
 .navlinks{display:flex;gap:28px;align-items:center}
-.navlinks a{color:var(--muted);font-size:15px;font-weight:500;transition:color .15s}
+.navlinks a{color:var(--muted);font-size:15px;font-weight:500;transition:color .15s;cursor:pointer}
 .navlinks a:hover{color:var(--text)}
 .nav-cta{
   background:var(--accent);color:#1a1300;padding:9px 18px;border-radius:10px;
   font-weight:700;font-size:15px;transition:transform .12s,box-shadow .2s
 }
 .nav-cta:hover{transform:translateY(-1px);box-shadow:var(--glow)}
-.menu-btn{display:none}
 
 /* ---------- hero ---------- */
-.hero{position:relative;text-align:center;padding:96px 0 72px;overflow:hidden}
+.hero{position:relative;text-align:center;padding:96px 0 80px;overflow:hidden}
 .zfield{position:absolute;inset:0;pointer-events:none;z-index:0}
 .zfield span{
   position:absolute;font-family:"Bricolage Grotesque";font-weight:800;
@@ -164,8 +163,28 @@ nav .wordmark{font-size:24px}
 .fineprint{font-size:13px;color:var(--dim);font-weight:500}
 .fineprint span{color:var(--muted)}
 
-/* ---------- sections ---------- */
-section{padding:84px 0}
+/* ---------- tabs ---------- */
+.tabs-section{border-top:1px solid var(--line)}
+.tab-bar{
+  display:flex;flex-wrap:wrap;gap:0;
+  border-bottom:1px solid var(--line);
+  max-width:var(--maxw);margin:0 auto;padding:0 24px;
+}
+.tab-btn{
+  background:none;border:none;border-bottom:2px solid transparent;
+  margin-bottom:-1px;padding:18px 26px;
+  font-family:"Manrope",system-ui,sans-serif;
+  font-size:15px;font-weight:600;color:var(--muted);
+  cursor:pointer;transition:color .15s,border-color .15s;
+  letter-spacing:0;
+}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ---------- panel content ---------- */
+.panel-inner{max-width:var(--maxw);margin:0 auto;padding:64px 24px 80px}
 .section-head{max-width:640px;margin-bottom:48px}
 .section-head .label{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
 .section-head h2{font-size:clamp(28px,4vw,42px);font-weight:700;margin-bottom:14px}
@@ -186,7 +205,7 @@ section{padding:84px 0}
 .card h3{font-size:20px;font-weight:700;margin-bottom:8px}
 .card p{color:var(--muted);font-size:15px}
 
-/* how it works — a real 3-step sequence, so numbering earns its place */
+/* how it works */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .step{position:relative;padding-top:18px}
 .step .n{
@@ -195,6 +214,7 @@ section{padding:84px 0}
 }
 .step h3{font-size:18px;margin-bottom:6px}
 .step p{color:var(--muted);font-size:15px}
+.panel-how{background:var(--bg-2);border-bottom:1px solid var(--line)}
 
 /* FAQ */
 .faq{max-width:760px}
@@ -210,7 +230,7 @@ details .body{padding:0 22px 20px;color:var(--muted);font-size:15px}
 details .body b{color:var(--text)}
 
 /* donate */
-.donate{text-align:center}
+.donate-panel{text-align:center}
 .donate-card{
   max-width:560px;margin:0 auto;background:linear-gradient(160deg,var(--bg-3),var(--bg-2));
   border:1px solid var(--line);border-radius:24px;padding:48px 34px
@@ -230,8 +250,8 @@ footer a:hover{color:var(--text)}
 @media (max-width:760px){
   .navlinks{display:none}
   .grid,.steps{grid-template-columns:1fr}
-  section{padding:60px 0}
-  .hero{padding:64px 0 48px}
+  .hero{padding:64px 0 56px}
+  .tab-btn{padding:14px 18px;font-size:14px}
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -245,17 +265,16 @@ footer a:hover{color:var(--text)}
   <div class="wrap">
     <a href="#" aria-label="Zzz home"><span class="wordmark">Zzz</span></a>
     <div class="navlinks">
-      <a href="#features">Features</a>
-      <a href="#how">How it works</a>
-      <a href="#faq">FAQ</a>
-      <a href="#donate">Donate</a>
+      <a onclick="openTab('features')">Features</a>
+      <a onclick="openTab('how')">How it works</a>
+      <a onclick="openTab('faq')">FAQ</a>
+      <a onclick="openTab('donate')">Donate</a>
       <a href="#download" class="nav-cta">Download</a>
     </div>
   </div>
 </nav>
 
 <header class="hero">
-  <!-- ambient drifting z's -->
   <div class="zfield" aria-hidden="true">
     <span style="left:12%;font-size:34px;animation-delay:0s">z</span>
     <span style="left:24%;font-size:22px;animation-delay:2.4s">z</span>
@@ -268,7 +287,7 @@ footer a:hover{color:var(--text)}
   <div class="wrap inner">
     <span class="eyebrow"><span class="dot"></span> Free · No account · Works in any browser</span>
     <h1>Your computer keeps falling asleep.<br><em>Zzz</em> keeps it awake.</h1>
-    <p class="sub">Use it right here in your browser — <b>no download needed</b>. Or grab the desktop app for your menu bar. No sleep, no screensaver, no screen lock.</p>
+    <p class="sub">Use it right here in your browser — <b>no download needed</b>. Or grab the desktop app for your menu bar.</p>
 
     <div class="web-card" id="web-card">
       <div class="web-status">
@@ -296,95 +315,105 @@ footer a:hover{color:var(--text)}
   </div>
 </header>
 
-<section id="features">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="label">What it does</div>
-      <h2>One switch between awake and asleep.</h2>
-      <p>Zzz sends a single harmless keypress every few minutes — the same trick as classic tools like Caffeine — so your machine thinks you're still there.</p>
-    </div>
-    <div class="grid">
-      <div class="card">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-        <h3>Stays awake</h3>
-        <p>No sleep, no dimming, no screensaver, no idle screen lock — for as long as you leave it on.</p>
-      </div>
-      <div class="card">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/><circle cx="9" cy="12" r="3" fill="currentColor"/></svg></div>
-        <h3>One click on/off</h3>
-        <p>Lives in your menu bar / system tray. Click to toggle. The icon glows when it's keeping you awake.</p>
-      </div>
-      <div class="card">
-        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div>
-        <h3>Your interval</h3>
-        <p>Pick how often it nudges — roughly every 2, 3–4, or 5 minutes. A little randomness keeps it natural.</p>
-      </div>
-    </div>
+<!-- ============ TABS ============ -->
+<div class="tabs-section" id="tabs">
+  <div class="tab-bar">
+    <button class="tab-btn" id="tab-features" onclick="openTab('features')">Features</button>
+    <button class="tab-btn" id="tab-how" onclick="openTab('how')">How it works</button>
+    <button class="tab-btn" id="tab-faq" onclick="openTab('faq')">FAQ</button>
+    <button class="tab-btn" id="tab-donate" onclick="openTab('donate')">☕ Donate</button>
   </div>
-</section>
 
-<section id="how" style="background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="label">How it works</div>
-      <h2>Running in about a minute.</h2>
-    </div>
-    <div class="steps">
-      <div class="step"><div class="n">1</div><h3>Download &amp; open</h3><p>Grab the build for your system and launch it. On macOS, allow the Accessibility permission when prompted.</p></div>
-      <div class="step"><div class="n">2</div><h3>Find the tray icon</h3><p>Zzz tucks itself into your menu bar (Mac) or system tray (Windows). No window, no clutter.</p></div>
-      <div class="step"><div class="n">3</div><h3>Toggle &amp; forget</h3><p>Click to switch on. Your screen stays awake until you turn it off or quit. That's it.</p></div>
+  <div id="panel-features" class="tab-panel">
+    <div class="panel-inner">
+      <div class="section-head">
+        <div class="label">What it does</div>
+        <h2>One switch between awake and asleep.</h2>
+        <p>Zzz sends a single harmless keypress every few minutes — the same trick as classic tools like Caffeine — so your machine thinks you're still there.</p>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <h3>Stays awake</h3>
+          <p>No sleep, no dimming, no screensaver, no idle screen lock — for as long as you leave it on.</p>
+        </div>
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/><circle cx="9" cy="12" r="3" fill="currentColor"/></svg></div>
+          <h3>One click on/off</h3>
+          <p>Lives in your menu bar / system tray. Click to toggle. The icon glows when it's keeping you awake.</p>
+        </div>
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h10M4 18h7"/></svg></div>
+          <h3>Your interval</h3>
+          <p>Pick how often it nudges — roughly every 2, 3–4, or 5 minutes. A little randomness keeps it natural.</p>
+        </div>
+      </div>
     </div>
   </div>
-</section>
 
-<section id="faq">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="label">Good to know</div>
-      <h2>Questions, answered straight.</h2>
-    </div>
-    <div class="faq">
-      <details open>
-        <summary>Do I need to download anything?</summary>
-        <div class="body">No. Click <b>"Keep Awake"</b> on this page and your screen stays on — no installation, no account, nothing to download. The browser version uses the <b>Screen Wake Lock API</b>, a standard web feature built into Chrome, Edge, and Safari. The desktop app is an optional alternative if you prefer a tray icon.</div>
-      </details>
-      <details>
-        <summary>Is it safe? What is it actually doing?</summary>
-        <div class="body">Zzz sends an <b>F15 keypress</b> — a key that does nothing visible (it doesn't type, click, or move anything) — every few minutes. That resets your system's idle timer so the screen won't sleep or lock. No account, no tracking, no data leaves your machine.</div>
-      </details>
-      <details>
-        <summary>Will it work on my work / company laptop?</summary>
-        <div class="body">Often not. <b>Managed devices</b> (with MDM, Intune, or group policy) can enforce screen lock in ways a keypress can't reset, and IT can see and block apps like this. Zzz is built for your <b>own</b> computer — presentations, downloads, reading, monitoring. Please don't use it to get around your employer's security policy.</div>
-      </details>
-      <details>
-        <summary>Why does macOS ask for an Accessibility permission?</summary>
-        <div class="body">Sending a keypress is a system-level action, so macOS asks you to allow it under <b>Settings → Privacy &amp; Security → Accessibility</b>. Without it, Zzz runs but the keypress has no effect.</div>
-      </details>
-      <details>
-        <summary>Why does my browser warn me when I open it?</summary>
-        <div class="body">The first builds aren't code-signed yet, so Windows SmartScreen or macOS Gatekeeper may show a warning. On Windows: <b>More info → Run anyway</b>. On macOS: <b>right-click → Open</b>.</div>
-      </details>
-      <details>
-        <summary>How much does it cost?</summary>
-        <div class="body">Nothing — Zzz is free. If it saves you the annoyance of a locked screen, a small donation helps keep it maintained. Entirely optional.</div>
-      </details>
+  <div id="panel-how" class="tab-panel panel-how">
+    <div class="panel-inner">
+      <div class="section-head">
+        <div class="label">How it works</div>
+        <h2>Running in about a minute.</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><h3>Download &amp; open</h3><p>Grab the build for your system and launch it. On macOS, allow the Accessibility permission when prompted.</p></div>
+        <div class="step"><div class="n">2</div><h3>Find the tray icon</h3><p>Zzz tucks itself into your menu bar (Mac) or system tray (Windows). No window, no clutter.</p></div>
+        <div class="step"><div class="n">3</div><h3>Toggle &amp; forget</h3><p>Click to switch on. Your screen stays awake until you turn it off or quit. That's it.</p></div>
+      </div>
     </div>
   </div>
-</section>
 
-<section id="donate" class="donate" style="background:var(--bg-2);border-top:1px solid var(--line)">
-  <div class="wrap">
-    <div class="donate-card">
-      <div class="cup">☕</div>
-      <h2>Buy me a coffee</h2>
-      <p>Zzz is free and always will be. If it keeps your screen awake when you need it, you can keep the developer awake too.</p>
-      <a class="btn primary" href="https://www.paypal.com/donate/?hosted_button_id=8YKXMA9WWDFCG" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h13a4 4 0 0 1 0 8h-1v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V4Zm12 6a2 2 0 0 0 0-4h-1v4h1ZM3 21h16v1.5H3z"/></svg>
-        Support Zzz
-      </a>
+  <div id="panel-faq" class="tab-panel">
+    <div class="panel-inner">
+      <div class="section-head">
+        <div class="label">Good to know</div>
+        <h2>Questions, answered straight.</h2>
+      </div>
+      <div class="faq">
+        <details open>
+          <summary>Do I need to download anything?</summary>
+          <div class="body">No. Click <b>"Keep Awake"</b> on this page and your screen stays on — no installation, no account, nothing to download. The browser version uses the <b>Screen Wake Lock API</b>, a standard web feature built into Chrome, Edge, and Safari. The desktop app is an optional alternative if you prefer a tray icon.</div>
+        </details>
+        <details>
+          <summary>Is it safe? What is it actually doing?</summary>
+          <div class="body">Zzz sends an <b>F15 keypress</b> — a key that does nothing visible (it doesn't type, click, or move anything) — every few minutes. That resets your system's idle timer so the screen won't sleep or lock. No account, no tracking, no data leaves your machine.</div>
+        </details>
+        <details>
+          <summary>Will it work on my work / company laptop?</summary>
+          <div class="body">Often not. <b>Managed devices</b> (with MDM, Intune, or group policy) can enforce screen lock in ways a keypress can't reset, and IT can see and block apps like this. Zzz is built for your <b>own</b> computer — presentations, downloads, reading, monitoring. Please don't use it to get around your employer's security policy.</div>
+        </details>
+        <details>
+          <summary>Why does macOS ask for an Accessibility permission?</summary>
+          <div class="body">Sending a keypress is a system-level action, so macOS asks you to allow it under <b>Settings → Privacy &amp; Security → Accessibility</b>. Without it, Zzz runs but the keypress has no effect.</div>
+        </details>
+        <details>
+          <summary>Why does my browser warn me when I open it?</summary>
+          <div class="body">The first builds aren't code-signed yet, so Windows SmartScreen or macOS Gatekeeper may show a warning. On Windows: <b>More info → Run anyway</b>. On macOS: <b>right-click → Open</b>.</div>
+        </details>
+        <details>
+          <summary>How much does it cost?</summary>
+          <div class="body">Nothing — Zzz is free. If it saves you the annoyance of a locked screen, a small donation helps keep it maintained. Entirely optional.</div>
+        </details>
+      </div>
     </div>
   </div>
-</section>
+
+  <div id="panel-donate" class="tab-panel donate-panel">
+    <div class="panel-inner">
+      <div class="donate-card">
+        <div class="cup">☕</div>
+        <h2>Buy me a coffee</h2>
+        <p>Zzz is free and always will be. If it keeps your screen awake when you need it, you can keep the developer awake too.</p>
+        <a class="btn primary" href="https://www.paypal.com/donate/?hosted_button_id=8YKXMA9WWDFCG" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h13a4 4 0 0 1 0 8h-1v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V4Zm12 6a2 2 0 0 0 0-4h-1v4h1ZM3 21h16v1.5H3z"/></svg>
+          Support Zzz
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <footer>
   <div class="wrap">
@@ -411,6 +440,22 @@ footer a:hover{color:var(--text)}
     }
   })();
   document.getElementById("yr").textContent = new Date().getFullYear();
+
+  // Tabs
+  function openTab(id) {
+    var panels = document.querySelectorAll(".tab-panel");
+    var btns = document.querySelectorAll(".tab-btn");
+    var isActive = document.getElementById("panel-" + id).classList.contains("active");
+
+    panels.forEach(function(p){ p.classList.remove("active"); });
+    btns.forEach(function(b){ b.classList.remove("active"); });
+
+    if (!isActive) {
+      document.getElementById("panel-" + id).classList.add("active");
+      document.getElementById("tab-" + id).classList.add("active");
+      document.getElementById("tabs").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
 
   // Wake Lock
   var wakeLock = null;
@@ -477,7 +522,6 @@ footer a:hover{color:var(--text)}
     }
   }
 
-  // Re-acquire lock when tab becomes visible again
   document.addEventListener("visibilitychange", async function() {
     if (wakeLock !== null && document.visibilityState === "visible") {
       try { wakeLock = await navigator.wakeLock.request("screen"); } catch(e) {}
